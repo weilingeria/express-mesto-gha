@@ -38,13 +38,14 @@ module.exports.createUser = (req, res) => {
   })
     .then((user) => {
       res.send({
+        _id: user._id,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
       });
     })
     .catch((err) => {
-      if (err.name === 'BadRequest') {
+      if (err.name === 'ValidationError') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
@@ -61,7 +62,7 @@ module.exports.updateUserInfo = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'BadRequest') {
+      if (err.name === 'ValidationError') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден' });
@@ -82,7 +83,7 @@ module.exports.updateAvatar = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'BadRequest') {
+      if (err.name === 'ValidationError') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден' });
