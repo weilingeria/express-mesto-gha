@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 
+const NotFound = require('./errors/NotFoundError');
+
 // Запуск на 3000 порту
 const { PORT = 3000 } = process.env;
 
@@ -27,8 +29,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use('/*', (req, res) => {
-  res.status(404).json({ message: 'Запрашиваемый ресурс не найден' });
+app.use('*', () => {
+  throw new NotFound('Запрашиваемый ресурс не найден');
 });
 
 app.listen(PORT);

@@ -27,7 +27,7 @@ module.exports.createCard = (req, res) => {
 // Находим карточку по id и удаляем
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .onFail(new NotFound('Карточка с указанным _id не найдена.'))
+    .onFail(new NotFound('Карточка с указанным _id не найдена'))
     .then((card) => res.send({ data: card, message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -47,13 +47,13 @@ module.exports.putCardLike = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .onFail(new NotFound('Карточка с указанным _id не найдена.'))
+    .onFail(new NotFound('Карточка с указанным _id не найдена'))
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {
@@ -69,13 +69,13 @@ module.exports.removeCardLike = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .onFail(new NotFound('Карточка с указанным _id не найдена.'))
+    .onFail(new NotFound('Карточка с указанным _id не найдена'))
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
       } else if (err.status === 404) {
         res.status(err.status).send({ message: err.message });
       } else {

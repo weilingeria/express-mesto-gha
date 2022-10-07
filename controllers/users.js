@@ -6,7 +6,7 @@ const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../u
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'Ошибка по-умолчанию' }));
+    .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
 };
 
 // Возвращаем пользователя по идентификатору
@@ -45,7 +45,7 @@ module.exports.createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'BadRequest') {
-        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные при создании пользователя.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else {
         res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
       }
@@ -55,7 +55,8 @@ module.exports.createUser = (req, res) => {
 // Обновляем информацию пользователя
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+    .orFail(new NotFound('Пользователь не найден'))
     .then((user) => {
       res.send({ data: user });
     })
@@ -63,7 +64,7 @@ module.exports.updateUserInfo = (req, res) => {
       if (err.name === 'BadRequest') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден' });
       } else if (err.status === 404) {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
       } else {
@@ -75,7 +76,8 @@ module.exports.updateUserInfo = (req, res) => {
 // Обновляем аватар
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .orFail(new NotFound('Пользователь не найден'))
     .then((user) => {
       res.send({ data: user });
     })
@@ -83,7 +85,7 @@ module.exports.updateAvatar = (req, res) => {
       if (err.name === 'BadRequest') {
         res.status(BAD_DATA_CODE).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(BAD_DATA_CODE).send({ message: 'Пользователь с указанным _id не найден' });
       } else if (err.status === 404) {
         res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Пользователь не найден' });
       } else {
