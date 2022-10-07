@@ -48,9 +48,7 @@ module.exports.putCardLike = (req, res) => {
     { new: true },
   )
     .onFail(new NotFound('Карточка с указанным _id не найдена'))
-    .then((card) => {
-      res.send({ data: card });
-    })
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
@@ -70,9 +68,7 @@ module.exports.removeCardLike = (req, res) => {
     { new: true },
   )
     .onFail(new NotFound('Карточка с указанным _id не найдена'))
-    .then((card) => {
-      res.send({ data: card });
-    })
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
