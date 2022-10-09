@@ -1,6 +1,5 @@
 const Card = require('../models/card');
-const NotFound = require('../errors/NotFoundError');
-const { BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
+const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // Возвращаем все карточки
 module.exports.getCards = (req, res) => {
@@ -38,8 +37,9 @@ module.exports.deleteCard = (req, res) => {
           res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
         }
       });
+    return;
   }
-  throw new NotFound('Карточка с указанным _id не найдена');
+  res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка с указанным _id не найдена' });
 };
 
 // Ставим лайк
@@ -60,8 +60,9 @@ module.exports.putCardLike = (req, res) => {
           res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
         }
       });
+    return;
   }
-  throw new NotFound('Карточка с указанным _id не найдена');
+  res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка с указанным _id не найдена' });
 };
 
 // Убираем лайк
@@ -82,6 +83,7 @@ module.exports.removeCardLike = (req, res) => {
           res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
         }
       });
+    return;
   }
-  throw new NotFound('Карточка с указанным _id не найдена');
+  res.status(NOT_FOUND_ERROR_CODE).send({ message: 'Карточка с указанным _id не найдена' });
 };
