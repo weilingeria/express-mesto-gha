@@ -11,20 +11,22 @@ module.exports.getUsers = (req, res) => {
 
 // Возвращаем пользователя по идентификатору
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
-    .orFail(new NotFound('Пользователь не найден'))
-    .then((user) => {
-      res.send({ data: user });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
-      } else if (err.status === 404) {
-        res.status(err.status).send({ message: err.message });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
+  if (req.params.userId.match(/^[0-9a-fA-F]{24}$/)) {
+    User.findById(req.params.userId)
+      .then((user) => {
+        res.send({ data: user });
+      })
+      .catch((err) => {
+        if (err.name === 'CastError') {
+          res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный _id' });
+        } else if (err.status === 404) {
+          res.status(err.status).send({ message: err.message });
+        } else {
+          res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+        }
+      });
+  }
+  throw new NotFound('Пользователь не найден');
 };
 
 // Создаем нового пользователя
