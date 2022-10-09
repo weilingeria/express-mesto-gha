@@ -3,10 +3,24 @@ const NotFound = require('../errors/NotFoundError');
 const { BAD_DATA_CODE, SERVER_ERROR_CODE } = require('../utils/constants');
 
 // Возвращаем все карточки
-module.exports.getCard = (req, res) => {
+module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
     .catch(() => res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' }));
+};
+
+// Возвращаем выбранную карточку
+module.exports.getCard = (req, res) => {
+  Card.findById(req.params.id)
+    .onFail(new NotFound('Карточка с указанным _id не найдена'))
+    .then((card) => res.send({ data: card }))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_DATA_CODE).send({ message: 'Введен некорректный id для поиска карточки' });
+      } else {
+        res.status(SERVER_ERROR_CODE).send({ message: 'На сервере произошла ошибка' });
+      }
+    });
 };
 
 // Создаем новую карточку
@@ -26,7 +40,7 @@ module.exports.createCard = (req, res) => {
 
 // Находим карточку по id и удаляем
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId, { runValidators: true })
     .onFail(new NotFound('Карточка с указанным _id не найдена'))
     .then((card) => res.send({ data: card, message: 'Карточка удалена' }))
     .catch((err) => {
@@ -45,10 +59,10 @@ module.exports.putCardLike = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true },
+    { new: true, runValidators: true },
   )
     .onFail(new NotFound('Карточка с указанным _id не найдена'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send({ data: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
@@ -65,10 +79,10 @@ module.exports.removeCardLike = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true },
+    { new: true, runValidators: true },
   )
     .onFail(new NotFound('Карточка с указанным _id не найдена'))
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send({ data: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_DATA_CODE).send({ message: 'Передан некорректный id' });
