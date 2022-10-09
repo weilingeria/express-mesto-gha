@@ -61,7 +61,7 @@ module.exports.putCardLike = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true, runValidators: true },
   )
-    .onFail(new NotFound('Карточка с указанным _id не найдена'))
+    /*.onFail(new NotFound('Карточка с указанным _id не найдена'))*/
     .then((card) => res.send({ data: card.likes }))
     .catch((err) => {
       if (err.name === 'CastError') {
