@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const path = require('path');
+const auth = require('./middlewares/auth');
+const { createUser, login } = require('./controllers/users');
 
 // Запуск на 3000 порту
 const { PORT = 3000 } = process.env;
@@ -18,22 +20,18 @@ function error404(req, res) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '633c900f73c4712dfb593921',
-  };
-  next();
-});
-
 // Подключение к серверу MongoDB
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-app.use('/users', require('./routes/users'));
-app.use('/cards', require('./routes/cards'));
+app.post('/signin', login);
+app.post('/signup', createUser);
 
-app.use('*', error404);
+app.use(auth, '/users', require('./routes/users'));
+app.use(auth, '/cards', require('./routes/cards'));
+
+app.use(auth, '*', error404);
 
 app.listen(PORT);
