@@ -2,7 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFound = require('../errors/NotFoundError');
-const { NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE, CONFLICT_ERROR } = require('../utils/constants');
+const {
+  NOT_FOUND_ERROR_CODE, BAD_DATA_CODE, SERVER_ERROR_CODE, CONFLICT_ERROR,
+} = require('../utils/constants');
 
 // Возвращаем всех пользователей
 module.exports.getUsers = (req, res) => {
